@@ -1,0 +1,135 @@
+<h2><%= @calendar.new_record? ? 'Новое назначение' : 'Редактировать назначение' %></h2>
+
+<%= form_with(model: [@project, @calendar], local: true, id: 'calendar_form') do |f| %>
+  <fieldset class="box tabular">
+    <div class="splitcontentleft">
+
+      <p>
+        <%= f.label :issue_category_id, 'Категория' %>
+        <%= f.collection_select :issue_category_id, @project.issue_categories, :id, :name, include_blank: false, class: 'select' %>
+      </p>
+
+      <p>
+        <%= f.label :user_id, 'Назначение' %>
+        <%= f.collection_select :user_id, @project.assignable_users, :id, :name, include_blank: false, class: 'select' %>
+      </p>
+
+      <p>
+        <%= f.label :all_day, 'Весь день' %>
+        <%= f.check_box :all_day, { id: 'all_day_checkbox' }, '1', '0' %>
+      </p>
+
+      <p id="event_start_date_time_field">
+        <%= f.label :event_start_date_time, 'Дата и время начала', id: 'event_start_date_time_label' %>
+        <%= f.datetime_local_field :event_start_date_time, size: 10, id: 'event_start_date_time' %>
+      </p>
+
+      <p id="event_date_field">
+        <%= f.label :event_date, 'Дата начала', id: 'event_date_label' %>
+        <%= f.date_field :event_date, size: 10, id: 'event_date' %>
+      </p>
+
+      <p id="event_end_date_field">
+        <%= f.label :event_end_date_time, 'Дата и время окончания' %>
+        <%= f.datetime_local_field :event_end_date_time, size: 10 %>
+      </p>
+
+      <p>
+        <%= f.label :recurring, 'Повторяющееся' %>
+        <%= f.check_box :recurring, { id: 'recurring_checkbox' }, '1', '0' %>
+      </p>
+    </div>
+  </fieldset>
+
+  <fieldset class="box tabular" id="recurrence_settings" style="display: <%= @calendar.recurring? ? 'block' : 'none' %>;">
+    <legend>Настройки повторения</legend>
+    <div class="splitcontentleft">
+
+      <p>
+        <%= f.label :event_ends_after_date, 'Прекратить после' %>
+        <%= f.date_field :event_ends_after_date, class: 'date', size: 10 %>
+      </p>
+
+      <p>
+        <%= f.label :frequency, 'Частота' %>
+        <%= f.select :frequency, options_for_select(['Ежедневно', 'Еженедельно'], @calendar.frequency), {}, { id: 'frequency_select', class: 'select' } %>
+      </p>
+
+      <p>
+        <%= f.label :interval, 'Интервал' %>
+        <%= f.number_field :interval, min: 1, value: @calendar.interval, class: 'small', size: 3 %>
+        <%= 'дней/недель' %>
+      </p>
+
+      <p id="weekdays_field">
+        <%= f.label :weekdays, 'Дни недели' %>
+        <% %w(понедельник вторник среда четверг пятница суббота воскресенье).each_with_index do |day, idx| %>
+          <%= check_box_tag 'category_assignment_calendar[weekdays][]', idx, @calendar.weekdays.map{ |w| w.to_s.to_i }.include?(idx), class: 'checkbox' %>
+          <%= label_tag "category_assignment_calendar_weekdays_#{day}", day.capitalize, class: "inline" %>
+        <% end %>
+      </p>
+
+    </div>
+  </fieldset>
+
+  <p>
+    <%= f.submit 'Сохранить', class: 'button' %>
+  </p>
+<% end %>
+
+<%= link_to 'Назад', project_category_assignment_calendars_path(@project), class: 'icon icon-back' %>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize datepicker and timepicker fields
+        //$('.date').datepicker();
+        //$('.time').timepicker();
+
+        const recurringCheckbox = document.getElementById('recurring_checkbox');
+        const recurrenceSettings = document.getElementById('recurrence_settings');
+        const frequencySelect = document.getElementById('frequency_select');
+        const weekdaysField = document.getElementById('weekdays_field');
+        const allDayCheckbox = document.getElementById('all_day_checkbox');
+        const eventDate = document.getElementById('event_date_field');
+        const startDatetimeTime = document.getElementById('event_start_date_time_field');
+        const endDatetimeField = document.getElementById('event_end_date_field');
+        const startDateTimeLabel = document.getElementById('start_date_label');
+
+        function toggleRecurrenceSettings() {
+            if (recurringCheckbox.checked) {
+                recurrenceSettings.style.display = 'block';
+                toggleWeekdaysField();
+            } else {
+                recurrenceSettings.style.display = 'none';
+            }
+        }
+
+        function toggleWeekdaysField() {
+            if (frequencySelect.value === 'Еженедельно') {
+                weekdaysField.style.display = 'block';
+            } else {
+                weekdaysField.style.display = 'none';
+            }
+        }
+
+        function toggleAllDaySettings() {
+            if (allDayCheckbox.checked) {
+                eventDate.style.display = 'block';
+                startDatetimeTime.style.display = 'none';
+                endDatetimeField.style.display = 'none';
+            } else {
+                eventDate.style.display = 'none';
+                startDatetimeTime.style.display = 'block';
+                endDatetimeField.style.display = 'block';
+            }
+        }
+
+        recurringCheckbox.addEventListener('change', toggleRecurrenceSettings);
+        frequencySelect.addEventListener('change', toggleWeekdaysField);
+        allDayCheckbox.addEventListener('change', toggleAllDaySettings);
+
+        // Initial checks to set the correct display state on page load
+        toggleRecurrenceSettings();
+        toggleAllDaySettings();
+    });
+</script>

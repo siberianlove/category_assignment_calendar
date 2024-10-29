@@ -1,0 +1,98 @@
+<% content_for :header_tags do %>
+  <%= stylesheet_link_tag 'plugin_name', plugin: 'category_assignment_calendar' %>
+<% end %>
+
+<div class="generic-table">
+  <table class="list issues">
+    <thead>
+    <tr>
+      <th>№</th>
+      <th>Категория</th>
+      <th>Пользователь</th>
+      <th>Начало</th>
+      <th>Конец</th>
+      <th>Частота</th>
+      <th>Интервал</th>
+      <th>Дни недели</th>
+      <th>Прекратить после</th>
+      <th>Ближайшее совпадение</th>
+      <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% if @calendars.any? %>
+      <% @calendars.sort_by { |c| c.id }.each do |calendar| %>
+        <tr>
+          <td><%= calendar.id %></td>
+          <td><%= calendar.issue_category.name %></td>
+          <td><%= calendar.principal.name %></td>
+          <td>
+            <% if calendar.all_day? %>
+              <%= calendar.event_date %>
+            <% else %>
+              <%= calendar.event_start_date_time %>
+            <% end %>
+          </td>
+          <td>
+            <% if calendar.all_day? %>
+              <%= calendar.event_date %>
+            <% else %>
+              <%= calendar.event_end_date_time %>
+            <% end %>
+          </td>
+          <td>
+            <% if calendar.recurring? %>
+              <%= "#{calendar.frequency}" %>
+            <% else %>
+              Нет
+            <% end %>
+          </td>
+          <td>
+            <% if calendar.recurring? %>
+              <%= "#{calendar.interval}" %>
+            <% else %>
+              Нет
+            <% end %>
+          </td>
+          <td>
+            <% if calendar.weekdays.present? %>
+              <%= %w(ПН ВТ СР ЧТ ПТ СБ ВС)
+                  .each_with_index
+                  .select { |day, idx| calendar.weekdays.map { |c| c.to_s.to_i }.include?(idx) }
+                  .map { |day, idx| day }
+                  .join(', ')
+              %>
+            <% else %>
+              Нет
+            <% end %>
+          </td>
+          <td>
+            <% if calendar.recurring? %>
+              <%= "#{calendar.event_ends_after_date}" %>
+            <% else %>
+              Нет
+            <% end %>
+          </td>
+          <td>
+            <% if calendar.next_occurrence != nil %>
+              <%= "#{calendar.next_occurrence}" %>
+            <% else %>
+              Нет
+            <% end %>
+          </td>
+          <td>
+            <%= link_to 'Редактировать', edit_project_category_assignment_calendar_path(@project, calendar), class: 'icon icon-edit' %>
+            <%= link_to 'Удалить', project_category_assignment_calendar_path(@project, calendar), method: :delete, data: { confirm: 'Вы уверены?' }, class: 'icon icon-del' %>
+          </td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr>
+        <td colspan="6"><%= 'Назначений не создано' %></td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+<%= link_to 'Добавить назначение', new_project_category_assignment_calendar_path(@project), class: 'icon icon-add' %>.
