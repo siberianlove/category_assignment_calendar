@@ -13,17 +13,29 @@ class CategoryAssignmentCalendar < ActiveRecord::Base
 
 
   def next_occurrence
-    occ = recurrence_rule.next_occurrence
-    if occurs_now?
-      enumerate_occurrences(IceCube::TimeUtil.now, IceCube::TimeUtil.now, options).first
-    elsif occ == nil or event_ends_after_date == nil or occ.start_time > IceCube::TimeUtil.end_of_date(event_ends_after_date)
-      nil
+    if recurring?
+      occ = recurrence_rule.next_occurrence
+      if occurs_now?
+        enumerate_occurrences(IceCube::TimeUtil.now, IceCube::TimeUtil.now, options).first
+      elsif occ == nil or (event_ends_after_date != nil and occ.start_time > IceCube::TimeUtil.end_of_date(event_ends_after_date))
+        nil
+      else
+        occ
+      end
+    elsif IceCube::TimeUtil.beginning_of_date(event_date) > IceCube::TimeUtil.now
+      event_date
     else
-      occ
+      nil
     end
   end
   def occurs_now?
-    recurrence_rule.occurs_at?(IceCube::TimeUtil.now)
+    if recurring
+      is_active? and recurrence_rule.occurs_at?(IceCube::TimeUtil.now)
+    elsif all_day?
+      is_active? and event_date == Date.today
+    else
+      false
+    end
   end
 
   def is_active?

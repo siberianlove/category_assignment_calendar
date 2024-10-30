@@ -22,24 +22,22 @@
     <tbody>
     <% if @calendars.any? %>
       <% @calendars.sort_by { |c| c.id }.each do |calendar| %>
-        <tr>
+        <tr <% if calendar.occurs_now? %> class="context-menu-selection" <% end %> >
           <td><%= calendar.id %></td>
           <td><%= calendar.issue_category.name %></td>
           <td><%= calendar.principal.name %></td>
-          <td>
-            <% if calendar.all_day? %>
+          <% if calendar.all_day? %>
+            <td colspan="2">
               <%= calendar.event_date %>
-            <% else %>
+            </td>
+          <% else %>
+            <td>
               <%= calendar.event_start_date_time %>
-            <% end %>
-          </td>
-          <td>
-            <% if calendar.all_day? %>
-              <%= calendar.event_date %>
-            <% else %>
+            </td>
+            <td>
               <%= calendar.event_end_date_time %>
-            <% end %>
-          </td>
+            </td>
+          <% end %>
           <td>
             <% if calendar.recurring? %>
               <%= "#{calendar.frequency}" %>
@@ -88,7 +86,7 @@
       <% end %>
     <% else %>
       <tr>
-        <td colspan="6"><%= 'Назначений не создано' %></td>
+        <td colspan="11"><%= 'Назначений не создано' %></td>
       </tr>
     <% end %>
     </tbody>
