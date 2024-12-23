@@ -19,11 +19,9 @@ class CategoryAssignmentCalendarsController < ApplicationController
     @calendar = @project.category_assignment_calendars.new(calendar_params)
 
     if @calendar.save
-      redirect_to project_category_assignment_calendars_path(@project), notice: 'Календарь назначений успешно создан.'
+      redirect_to project_category_assignment_calendars_path(@project), notice: ::I18n.t(:category_assignment_calendar_create_succeeded)
     else
-      logger.error "DEBUG: Ошибки сохранения: #{@calendar.errors.full_messages.join(", ")}"
-      logger.error "DEBUG: Параметры: #{calendar_params.inspect}"
-      flash[:error] = 'Не удалось создать календарь назначений. Проверьте введенные данные.'
+      flash[:error] = ::I18n.t(:category_assignment_calendar_create_error) + " #{@calendar.errors.full_messages.join(", ")}"
       render :new
     end
   end
@@ -35,19 +33,21 @@ class CategoryAssignmentCalendarsController < ApplicationController
   def update
     @calendar = @project.category_assignment_calendars.find(params[:id])
     if @calendar.update(calendar_params)
-      redirect_to project_category_assignment_calendars_path(@project), notice: 'Календарь назначений успешно обновлен.'
+      redirect_to project_category_assignment_calendars_path(@project), notice: ::I18n.t(:category_assignment_calendar_update_succeeded)
     else
-      logger.error "DEBUG: Ошибки сохранения: #{@calendar.errors.full_messages.join(", ")}"
-      logger.error "DEBUG: Параметры: #{calendar_params.inspect}"
-      flash[:error] = "Не удалось обновить календарь назначений. Проверьте введенные данные. Ошибки сохранения: #{@calendar.errors.full_messages.join(", ")}"
+      flash[:error] = ::I18n.t(:category_assignment_calendar_update_error) + " #{@calendar.errors.full_messages.join(", ")}"
       render :edit
     end
   end
 
   def destroy
     @calendar = @project.category_assignment_calendars.find(params[:id])
-    @calendar.destroy
-    redirect_to project_category_assignment_calendars_path(@project), notice: 'Календарь назначений успешно удалён.'
+    if @calendar.destroy
+      redirect_to project_category_assignment_calendars_path(@project), notice: ::I18n.t(:category_assignment_calendar_delete_succeeded)
+    else
+      flash[:error] = ::I18n.t(:category_assignment_calendar_delete_error) + " #{@calendar.errors.full_messages.join(", ")}"
+      render :index
+    end
   end
 
   private

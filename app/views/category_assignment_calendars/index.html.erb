@@ -7,16 +7,16 @@
     <thead>
     <tr>
       <th>№</th>
-      <th>Категория</th>
-      <th>Пользователь</th>
-      <th>Начало</th>
-      <th>Конец</th>
-      <th>Частота</th>
-      <th>Интервал</th>
-      <th>Дни недели</th>
-      <th>Прекратить после</th>
-      <th>Ближайшее совпадение</th>
-      <th>Действия</th>
+      <th><%= l(:field_category) %></th>
+      <th><%= l('activerecord.attributes.category_assignment_calendar.user_id') %></th>
+      <th><%= l(:category_assignment_calendar_begin) %></th>
+      <th><%= l(:category_assignment_calendar_end) %></th>
+      <th><%= l('activerecord.attributes.category_assignment_calendar.frequency') %></th>
+      <th><%= l('activerecord.attributes.category_assignment_calendar.interval') %></th>
+      <th><%= l('activerecord.attributes.category_assignment_calendar.weekdays') %></th>
+      <th><%= l('activerecord.attributes.category_assignment_calendar.event_ends_after_date') %></th>
+      <th><%= l(:category_assignment_calendar_next_occurrence) %></th>
+      <th><%= l(:label_activity) %></th>
     </tr>
     </thead>
     <tbody>
@@ -32,65 +32,72 @@
             </td>
           <% else %>
             <td>
-              <%= calendar.event_start_date_time %>
+              <%= calendar.event_start_date_time.change(:offset => Time.now.strftime("%:z")).getlocal %>
+              <%#= calendar.event_start_date_time %>
             </td>
             <td>
-              <%= calendar.event_end_date_time %>
+              <%= calendar.event_end_date_time.change(:offset => Time.now.strftime("%:z")).getlocal %>
+              <%#= calendar.event_end_date_time %>
             </td>
           <% end %>
           <td>
             <% if calendar.recurring? %>
               <%= "#{calendar.frequency}" %>
             <% else %>
-              Нет
+              <%= l(:general_text_No) %>
             <% end %>
           </td>
           <td>
             <% if calendar.recurring? %>
               <%= "#{calendar.interval}" %>
             <% else %>
-              Нет
+              <%= l(:general_text_No) %>
             <% end %>
           </td>
           <td>
             <% if calendar.weekdays.present? %>
-              <%= %w(ПН ВТ СР ЧТ ПТ СБ ВС)
+              <%= %w(ВС ПН ВТ СР ЧТ ПТ СБ)
+                  .rotate(1) # Сдвигаем так, чтобы понедельник был первым
                   .each_with_index
-                  .select { |day, idx| calendar.weekdays.map { |c| c.to_s.to_i }.include?(idx) }
-                  .map { |day, idx| day }
+                  .select { |_, idx| calendar.weekdays.map { |c| c.to_s.to_i }.include?((idx + 1) % 7) } # Корректируем индексы
+                  .map { |day, _| day }
                   .join(', ')
               %>
             <% else %>
-              Нет
+              <%= l(:general_text_No) %>
             <% end %>
           </td>
           <td>
             <% if calendar.recurring? %>
               <%= "#{calendar.event_ends_after_date}" %>
             <% else %>
-              Нет
+              <%= l(:general_text_No) %>
             <% end %>
           </td>
           <td>
             <% if calendar.next_occurrence != nil %>
               <%= "#{calendar.next_occurrence}" %>
             <% else %>
-              Нет
+              <%= l(:general_text_No) %>
             <% end %>
           </td>
           <td>
-            <%= link_to 'Редактировать', edit_project_category_assignment_calendar_path(@project, calendar), class: 'icon icon-edit' %>
-            <%= link_to 'Удалить', project_category_assignment_calendar_path(@project, calendar), method: :delete, data: { confirm: 'Вы уверены?' }, class: 'icon icon-del' %>
+            <% if User.current.allowed_to?(:manage_assignment_calendar, @project) %>
+              <%= link_to l(:button_edit), edit_project_category_assignment_calendar_path(@project, calendar), class: 'icon icon-edit' %>
+              <%= link_to l(:button_delete), project_category_assignment_calendar_path(@project, calendar), method: :delete, data: { confirm: l(:text_are_you_sure) }, class: 'icon icon-del' %>
+            <% end %>
           </td>
         </tr>
       <% end %>
     <% else %>
       <tr>
-        <td colspan="11"><%= 'Назначений не создано' %></td>
+        <td colspan="11"><%= l(:category_assignment_calendar_empty) %></td>
       </tr>
     <% end %>
     </tbody>
   </table>
 </div>
 
-<%= link_to 'Добавить назначение', new_project_category_assignment_calendar_path(@project), class: 'icon icon-add' %>.
+<% if User.current.allowed_to?(:manage_assignment_calendar, @project) %>
+  <%= link_to l(:category_assignment_calendar_new_assignee), new_project_category_assignment_calendar_path(@project), class: 'icon icon-add' %>
+<% end %>

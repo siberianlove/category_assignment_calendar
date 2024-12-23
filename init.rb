@@ -15,10 +15,10 @@ Redmine::Plugin.register :category_assignment_calendar do
   url 'https://your-repository-url.com'
   author_url 'https://your-website.com'
 
-  project_module :issue_tracking do
-    permission :view_assignment_calendar, { category_assignment_calendars: [:index] }, public: true
+  project_module :category_assignment_calendar do
+    permission :view_assignment_calendar, { category_assignment_calendars: [:index] }, require: :member
     permission :manage_assignment_calendar, { category_assignment_calendars: [:new, :create, :edit, :update, :destroy] }, require: :member
   end
 
-  menu :project_menu, :category_assignment_calendars, { controller: 'category_assignment_calendars', action: 'index' }, caption: 'Назначения Календаря', after: :issues, :param => :project_id
+  menu :project_menu, :category_assignment_calendars, { controller: 'category_assignment_calendars', action: 'index' }, caption: :category_assignment_calendar_caption, after: :issues, :param => :project_id
 end

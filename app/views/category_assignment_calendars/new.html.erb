@@ -1,41 +1,41 @@
-<h2><%= @calendar.new_record? ? 'Новое назначение' : 'Редактировать назначение' %></h2>
+<h2><%= @calendar.new_record? ? l(:category_assignment_calendar_new_assignee) : l(:category_assignment_calendar_edit_assignee) %></h2>
 
 <%= form_with(model: [@project, @calendar], local: true, id: 'calendar_form') do |f| %>
   <fieldset class="box tabular">
     <div class="splitcontentleft">
 
       <p>
-        <%= f.label :issue_category_id, 'Категория' %>
+        <%= f.label :issue_category_id, l(:field_category) %>
         <%= f.collection_select :issue_category_id, @project.issue_categories, :id, :name, include_blank: false, class: 'select' %>
       </p>
 
       <p>
-        <%= f.label :user_id, 'Назначение' %>
+        <%= f.label :user_id, l('activerecord.attributes.category_assignment_calendar.user_id') %>
         <%= f.collection_select :user_id, @project.assignable_users, :id, :name, include_blank: false, class: 'select' %>
       </p>
 
       <p>
-        <%= f.label :all_day, 'Весь день' %>
+        <%= f.label :all_day, l('activerecord.attributes.category_assignment_calendar.all_day') %>
         <%= f.check_box :all_day, { id: 'all_day_checkbox' }, '1', '0' %>
       </p>
 
       <p id="event_start_date_time_field">
-        <%= f.label :event_start_date_time, 'Дата и время начала', id: 'event_start_date_time_label' %>
+        <%= f.label :event_start_date_time, l('activerecord.attributes.category_assignment_calendar.event_start_date_time'), id: 'event_start_date_time_label' %>
         <%= f.datetime_local_field :event_start_date_time, size: 10, id: 'event_start_date_time' %>
       </p>
 
       <p id="event_date_field">
-        <%= f.label :event_date, 'Дата начала', id: 'event_date_label' %>
+        <%= f.label :event_date, l('activerecord.attributes.category_assignment_calendar.event_date'), id: 'event_date_label' %>
         <%= f.date_field :event_date, size: 10, id: 'event_date' %>
       </p>
 
       <p id="event_end_date_field">
-        <%= f.label :event_end_date_time, 'Дата и время окончания' %>
+        <%= f.label :event_end_date_time, l('activerecord.attributes.category_assignment_calendar.event_end_date_time') %>
         <%= f.datetime_local_field :event_end_date_time, size: 10 %>
       </p>
 
       <p>
-        <%= f.label :recurring, 'Повторяющееся' %>
+        <%= f.label :recurring, l('activerecord.attributes.category_assignment_calendar.recurring') %>
         <%= f.check_box :recurring, { id: 'recurring_checkbox' }, '1', '0' %>
       </p>
     </div>
@@ -46,25 +46,25 @@
     <div class="splitcontentleft">
 
       <p>
-        <%= f.label :event_ends_after_date, 'Прекратить после' %>
+        <%= f.label :event_ends_after_date, l('activerecord.attributes.category_assignment_calendar.event_ends_after_date') %>
         <%= f.date_field :event_ends_after_date, class: 'date', size: 10 %>
       </p>
 
       <p>
-        <%= f.label :frequency, 'Частота' %>
-        <%= f.select :frequency, options_for_select(['Ежедневно', 'Еженедельно'], @calendar.frequency), {}, { id: 'frequency_select', class: 'select' } %>
+        <%= f.label :frequency, l('activerecord.attributes.category_assignment_calendar.frequency') %>
+        <%= f.select :frequency, options_for_select([l('category_assignment_calendar_daily'), l('category_assignment_calendar_weekly'), l('category_assignment_calendar_monthly'), l('category_assignment_calendar_yearly')], @calendar.frequency), {}, { id: 'frequency_select', class: 'select' } %>
       </p>
 
       <p>
-        <%= f.label :interval, 'Интервал' %>
+        <%= f.label :interval, l('activerecord.attributes.category_assignment_calendar.interval') %>
         <%= f.number_field :interval, min: 1, value: @calendar.interval, class: 'small', size: 3 %>
-        <%= 'дней/недель' %>
+        <%= l(:category_assignment_calendar_interval_label) %>
       </p>
 
       <p id="weekdays_field">
         <%= f.label :weekdays, 'Дни недели' %>
         <% %w(понедельник вторник среда четверг пятница суббота воскресенье).each_with_index do |day, idx| %>
-          <%= check_box_tag 'category_assignment_calendar[weekdays][]', idx, @calendar.weekdays.map{ |w| w.to_s.to_i }.include?(idx), class: 'checkbox' %>
+          <%= check_box_tag 'category_assignment_calendar[weekdays][]', (idx + 1) % 7, @calendar.weekdays.map{ |w| w.to_s.to_i }.include?((idx + 1) % 7), class: 'checkbox' %>
           <%= label_tag "category_assignment_calendar_weekdays_#{day}", day.capitalize, class: "inline" %>
         <% end %>
       </p>
@@ -73,11 +73,11 @@
   </fieldset>
 
   <p>
-    <%= f.submit 'Сохранить', class: 'button' %>
+    <%= f.submit l(:button_save), class: 'button' %>
   </p>
 <% end %>
 
-<%= link_to 'Назад', project_category_assignment_calendars_path(@project), class: 'icon icon-back' %>
+<%= link_to l(:button_back), project_category_assignment_calendars_path(@project), class: 'icon icon-back' %>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

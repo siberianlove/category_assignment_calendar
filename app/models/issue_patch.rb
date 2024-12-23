@@ -5,14 +5,16 @@ module IssuePatch
 
       def default_assign
         if assigned_to.nil?
-          if category && category.category_assignment_calendars
-            user = category.category_assignment_calendars
-                           .select { |c| c.is_active? }
-                           .select { |c| c.occurs_now? }
-                           .sort_by { |c| c.id }
-                           .first
-            unless user.nil?
-              self.assigned_to = user.user
+          if project&.enabled_module_names&.include?('category_assignment_calendar')
+            if category && category.category_assignment_calendars
+              user = category.category_assignment_calendars
+                             .select { |c| c.is_active? }
+                             .select { |c| c.occurs_now? }
+                             .sort_by { |c| c.id }
+                             .first
+              unless user.nil?
+                self.assigned_to = user.user
+              end
             end
           end
           if assigned_to.nil?
