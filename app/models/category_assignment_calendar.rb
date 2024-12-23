@@ -58,7 +58,7 @@ class CategoryAssignmentCalendar < ActiveRecord::Base
     elsif all_day? && IceCube::TimeUtil.beginning_of_date(event_date) > t_now
       event_date
     elsif !all_day? && event_start_date_time > t_now
-      Occurrence(event_start_date_time, event_end_date_time)
+      IceCube::Occurrence.new(event_start_date_time.change(:offset => Time.now.strftime("%:z")).getlocal, event_end_date_time.change(:offset => Time.now.strftime("%:z")).getlocal)
     else
       nil
     end
