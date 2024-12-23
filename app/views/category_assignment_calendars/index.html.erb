@@ -16,6 +16,7 @@
       <th><%= l('activerecord.attributes.category_assignment_calendar.weekdays') %></th>
       <th><%= l('activerecord.attributes.category_assignment_calendar.event_ends_after_date') %></th>
       <th><%= l(:category_assignment_calendar_next_occurrence) %></th>
+      <th><%= l(:category_assignment_calendar_occurs_now) %></th>
       <th><%= l(:label_activity) %></th>
     </tr>
     </thead>
@@ -77,6 +78,13 @@
           <td>
             <% if calendar.next_occurrence != nil %>
               <%= "#{calendar.next_occurrence}" %>
+            <% else %>
+              <%= l(:general_text_No) %>
+            <% end %>
+          </td>
+          <td>
+            <% if calendar.occurs_now? %>
+              <%= l(:general_text_Yes) %>
             <% else %>
               <%= l(:general_text_No) %>
             <% end %>

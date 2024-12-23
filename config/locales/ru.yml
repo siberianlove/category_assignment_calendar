@@ -34,3 +34,4 @@ ru:
   category_assignment_calendar_begin: "Начало"
   category_assignment_calendar_end: "Конец"
   category_assignment_calendar_next_occurrence: "Следующее совпадение"
+  category_assignment_calendar_occurs_now: "Сейчас активно"

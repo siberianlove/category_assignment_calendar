@@ -34,3 +34,4 @@ en:
   category_assignment_calendar_begin: "Begin"
   category_assignment_calendar_end: "End"
   category_assignment_calendar_next_occurrence: "Next Occurrence"
+  category_assignment_calendar_occurs_now: "Occurs Now"
